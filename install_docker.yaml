@@ -1,0 +1,11 @@
+---
+- name: Installing Docker using Ansible
+  hosts: ubuntu
+  become: yes
+  roles:
+    - ubuntu
+
+- hosts: centos
+  become: true
+  roles:
+    - centos

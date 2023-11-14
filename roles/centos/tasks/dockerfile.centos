@@ -1,0 +1,22 @@
+# Use CentOS as the base image
+FROM centos:latest
+
+# MAINTAINER is deprecated in favor of LABEL, but keeping it for compatibility
+MAINTAINER jozette <qjpfermin@tip.edu.ph>
+
+# Use shell for ARG command in CentOS
+SHELL ["/bin/bash", "-c"]
+
+# Set environment variable for non-interactive installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install required packages
+RUN yum -y update && \
+    yum -y install httpd mariadb-server --disablerepo=appstream && \
+    yum clean all
+
+EXPOSE 80
+
+# Start Apache HTTP Server as the entry point
+ENTRYPOINT httpd -D FOREGROUND
+

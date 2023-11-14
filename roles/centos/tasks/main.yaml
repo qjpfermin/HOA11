@@ -1,0 +1,65 @@
+---
+  - name: Install docker
+    yum:
+      name: docker
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: Start and enable Docker service
+    service:
+      name: docker
+      state: started
+      enabled: true
+    when: ansible_distribution == "CentOS"
+
+  - name: Install docker sdk
+    pip:
+      name: docker-py
+      executable: pip3
+    when: ansible_distribution == "CentOS"
+
+  - name: Create Docker Group 
+    group:
+      name: docker
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: Add user to the docker group
+    user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: Create directory
+    file:
+      path: /root/demo-dockerfile.centos
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+    when: ansible_distribution == "CentOS"
+
+  - name: Copy dockerfile
+    copy:
+      src: ./dockerfile.centos
+      dest: /root/demo-dockerfile/dockerfile.centos
+      owner: root
+      group: root
+      mode: 0755
+    when: ansible_distribution == "CentOS"
+
+  - name: Build Docker image
+    docker_image:
+      path: ./root/demo-dockerfile
+      name: hoa11
+      tag: latest
+      buildargs:
+        listen_port: 8080
+    when: ansible_distribution == "CentOS"
+
+  - name: Access Containerized App
+    shell:
+      docker run -it -d -p 8080:80 hoa11
+    when: ansible_distribution == "CentOS"
+
